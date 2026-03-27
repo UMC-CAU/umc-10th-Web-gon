@@ -1,16 +1,12 @@
+import ContextPage from "./components/ContextPage";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
-import './App.css'
-import Todo from './components/Todo'
-import { TodoProvider } from './contexts/TodoContext'
-
-function App() {
-
-
+const App = () => {
   return (
-    <TodoProvider>
-      <Todo/>
-    </TodoProvider>
-  )
-}
+    <ThemeProvider>
+      <ContextPage />
+    </ThemeProvider>
+  );
+};
 
-export default App
+export default App;
