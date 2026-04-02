@@ -69,7 +69,6 @@ export default function MoviePage({ category }: MoviePageProps) {
 
     return (
         <div className="p-10">
-            {/* 동적으로 만들어둔 제목을 불러옵니다 */}
             <h1 className="text-3xl font-bold mb-8">{getTitle()}</h1>
             
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
