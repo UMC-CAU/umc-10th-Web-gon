@@ -1,4 +1,12 @@
 {
+<<<<<<< HEAD
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}
+=======
   "compilerOptions": {
     "target": "ES2016",         /* 번역할 자바스크립트 버전 */
     "module": "ES2015",         /* 모듈 시스템 (보통 ES6/ES2015 사용) */
@@ -9,3 +17,4 @@
     "noEmitOnError": true       /* 에러가 나면 JS 파일을 만들지 않음 */
   }
 }
+>>>>>>> b5e81ea3f072b183359c7a6fea8eb2dec3f2de3b
