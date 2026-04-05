@@ -1,11 +1,7 @@
 {
-  "compilerOptions": {
-    "target": "ES2016",         /* 번역할 자바스크립트 버전 */
-    "module": "ES2015",         /* 모듈 시스템 (보통 ES6/ES2015 사용) */
-    "rootDir": "./src",         /* TS 코드를 짤 폴더 위치 */
-    "outDir": "./dist",         /* 번역된 JS 파일이 저장될 위치 */
-    "strict": true,             /* 엄격한 타입 검사 켜기 */
-    "removeComments": true,     /* 컴파일 시 주석 제거 */
-    "noEmitOnError": true       /* 에러가 나면 JS 파일을 만들지 않음 */
-  }
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
 }
