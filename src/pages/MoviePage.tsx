@@ -1,47 +1,32 @@
 import { useEffect, useState } from "react";
-import axios from 'axios';
 import MovieCard from "../components/MovieCard";
 import type { Movie } from "../types/movie";
+import useCustomFetch from "../hooks/useCustomFetch";
 
 interface MoviePageProps {
     category: string;
 }
 
+interface MovieResponse {
+    results: Movie[];
+}
+
 export default function MoviePage({ category }: MoviePageProps) {
-    const [movies, setMovies] = useState<Movie[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isError, setIsError] = useState(false);
     const [page, setPage] = useState(1);
 
     useEffect(() => {
         setPage(1);
     }, [category]);
 
-    useEffect(() => {
-        const fetchMovies = async (): Promise<void> => {
-            setIsError(false);
-            setIsLoading(true);
-
-            try {
-                const { data } = await axios.get(
-                    `https://api.themoviedb.org/3/movie/${category}?language=en-US&page=${page}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
-                        }
-                    }
-                );
-                setMovies(data.results);
-            } catch (error) {
-                console.error("데이터 통신 중 에러 발생:", error);
-                setIsError(true);
-            } finally {
-                setIsLoading(false);
-            }
+    const { data, loading: isLoading, error: isError } = useCustomFetch<MovieResponse>(
+        `https://api.themoviedb.org/3/movie/${category}`,
+        {
+            language: 'ko-KR',
+            page: page
         }
+    );
 
-        fetchMovies();
-    }, [page, category]); 
+    const movies = data?.results;
 
     const getTitle = () => {
         if (category === 'popular') return '인기 영화 목록';
