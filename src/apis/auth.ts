@@ -1,17 +1,9 @@
-import axios from 'axios';
-
-const BASE_URL = 'http://localhost:8000'; 
+import { axiosInstance } from './api';
 
 export const postSignIn = async (signInData: any) => {
-  return await axios.post(`${BASE_URL}/v1/auth/signIn`, signInData);
+  return await axiosInstance.post('/v1/auth/signin', signInData);
 };
 
 export const postLogout = async () => {
-  const token = localStorage.getItem('accessToken');
-  
-  return await axios.post(`${BASE_URL}/v1/auth/signout`, null, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  return await axiosInstance.post('/v1/auth/signout');
 };
