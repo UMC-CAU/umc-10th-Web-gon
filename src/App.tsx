@@ -3,6 +3,7 @@ import ProtectedLayout from './components/ProtectedLayout';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import MyPage from './pages/MyPage';
+import GoogleCallbackPage from './pages/GoogleCallbackPage';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/v1/auth/google/callback" element={<GoogleCallbackPage />} />
 
         <Route element={<ProtectedLayout />}>
           <Route path="/my" element={<MyPage />} />
