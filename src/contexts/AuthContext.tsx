@@ -1,12 +1,12 @@
 import { createContext, useContext, useState } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { LOCAL_STORAGE_KEY } from '../constants/localStorageKey';
-import { postSignIn, postLogout } from '../apis/auth';
+import { postSignIn, postLogout, type SignInRequest } from '../apis/auth';
 
 interface AuthContextType {
   accessToken: string | null;
   refreshToken: string | null;
-  login: (signInData: any) => Promise<void>;
+  login: (signInData: SignInRequest) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -33,22 +33,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     getRefreshTokenFromStorage()
   );
 
-  const login = async (signInData: any) => {
-    try {
-      const { data } = await postSignIn(signInData);
-      const newAccessToken = data.data.accessToken; 
-      const newRefreshToken = data.data.refreshToken;
+  const login = async (signInData: SignInRequest) => {
+    const { data } = await postSignIn(signInData);
+    const newAccessToken = data.data.accessToken; 
+    const newRefreshToken = data.data.refreshToken;
 
-      setAccessTokenInStorage(newAccessToken);
-      setRefreshTokenInStorage(newRefreshToken);
-      setAccessToken(newAccessToken);
-      setRefreshToken(newRefreshToken);
-
-      alert('로그인 성공');
-    } catch (error) {
-      console.error(error);
-      alert('로그인 실패');
-    }
+    setAccessTokenInStorage(newAccessToken);
+    setRefreshTokenInStorage(newRefreshToken);
+    setAccessToken(newAccessToken);
+    setRefreshToken(newRefreshToken);
   };
 
   const logout = async () => {
