@@ -1,12 +1,13 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { getLPList } from '../apis/lp';
+import { getLPComments } from '../apis/lp';
 import { QUERY_KEYS } from '../constants/queryKeys';
 
-export const useGetLPList = (sort: 'ascending' | 'descending') => {
+export const useGetLPComments = (lpid: string, order: 'asc' | 'desc') => {
   return useInfiniteQuery({
-    queryKey: [QUERY_KEYS.LPS, sort],
-    queryFn: ({ pageParam }) => getLPList({ sort, cursor: pageParam, limit: 20 }),
+    queryKey: [QUERY_KEYS.LP_COMMENTS, lpid, order],
+    queryFn: ({ pageParam }) => getLPComments(lpid, { cursor: pageParam, limit: 10, order }),
     initialPageParam: 0,
+    enabled: !!lpid,
     getNextPageParam: (lastPage) => {
       if (!lastPage.data?.hasNext) return undefined;
       return lastPage.data.nextCursor;

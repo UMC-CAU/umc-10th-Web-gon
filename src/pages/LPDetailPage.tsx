@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetLPDetail } from '../hooks/useGetLPDetail';
-import Skeleton from '../components/Skeleton';
-import { deleteLP, likeLP, unlikeLP, updateLP } from '../apis/lp';
+import Skeleton, { CommentSkeletonList } from '../components/Skeleton';
+import { useGetLPComments } from '../hooks/useGetLPComments';
+import { createLPComment, deleteLP, likeLP, unlikeLP, updateLP } from '../apis/lp';
 import { getUsersMe } from '../apis/users';
 import { QUERY_KEYS } from '../constants/queryKeys';
 import { useAuth } from '../contexts/AuthContext';
@@ -16,6 +17,9 @@ export default function LPDetailPage() {
   const { accessToken } = useAuth();
   const { data, isPending, isError, refetch } = useGetLPDetail(lpid as string);
   const lp = data?.data;
+  const commentLoadMoreRef = useRef<HTMLDivElement | null>(null);
+  const [commentOrder, setCommentOrder] = useState<'asc' | 'desc'>('desc');
+  const [commentText, setCommentText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
     title: '',
@@ -30,6 +34,16 @@ export default function LPDetailPage() {
     enabled: !!accessToken,
     select: (res) => res.data.data,
   });
+
+  const {
+    data: commentsData,
+    isLoading: isCommentsLoading,
+    isError: isCommentsError,
+    refetch: refetchComments,
+    fetchNextPage: fetchNextCommentsPage,
+    hasNextPage: hasNextCommentsPage,
+    isFetchingNextPage: isFetchingNextCommentsPage,
+  } = useGetLPComments(lpid as string, commentOrder);
 
   useEffect(() => {
     if (!lp || isEditing) return;
@@ -102,12 +116,45 @@ export default function LPDetailPage() {
     },
   });
 
+  const createCommentMutation = useMutation({
+    mutationFn: () => createLPComment(lpid as string, { content: commentText.trim() }),
+    onSuccess: async () => {
+      setCommentText('');
+      await queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.LP_COMMENTS, lpid, commentOrder],
+      });
+    },
+    onError: (error: any) => {
+      showError(error, '댓글 등록에 실패했습니다.');
+    },
+  });
+
+  useEffect(() => {
+    const target = commentLoadMoreRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasNextCommentsPage && !isFetchingNextCommentsPage) {
+          fetchNextCommentsPage();
+        }
+      },
+      { rootMargin: '160px' },
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [fetchNextCommentsPage, hasNextCommentsPage, isFetchingNextCommentsPage, commentOrder]);
+
   if (isPending) return <Skeleton />;
   if (isError) return <QueryError message="LP 상세 정보를 불러오지 못했습니다." onRetry={() => refetch()} />;
 
   const createdAt = lp?.createdAt ? new Date(lp.createdAt).toLocaleDateString('ko-KR') : '';
   const isLiked = !!myInfo?.id && lp?.likes?.some((like: { userId: number }) => like.userId === myInfo.id);
   const isMutating = updateMutation.isPending || deleteMutation.isPending || likeMutation.isPending;
+  const comments = commentsData?.pages.flatMap((page) => page.data?.data || []) || [];
+  const isCommentInvalid = commentText.trim().length === 0;
+  const isCommentSubmitting = createCommentMutation.isPending;
 
   const handleEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,8 +189,21 @@ export default function LPDetailPage() {
     likeMutation.mutate(isLiked);
   };
 
+  const handleCommentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!accessToken) {
+      alert('로그인이 필요합니다.');
+      navigate('/login', { state: { from: `/lp/${lpid}` } });
+      return;
+    }
+
+    if (isCommentInvalid || isCommentSubmitting) return;
+    createCommentMutation.mutate();
+  };
+
   return (
-    <div className="flex justify-center items-start min-h-screen py-8">
+    <div className="flex min-h-screen flex-col items-center gap-8 py-8">
       <div className="w-full max-w-3xl bg-[#222222] rounded-2xl p-8 shadow-2xl">
         
         <div className="flex justify-between items-center mb-8">
@@ -266,6 +326,87 @@ export default function LPDetailPage() {
         </div>
         
       </div>
+
+      <section className="w-full max-w-3xl rounded-2xl bg-[#222222] p-6 shadow-2xl">
+        <div className="mb-5 flex items-center justify-between gap-4">
+          <h2 className="text-xl font-bold text-white">댓글</h2>
+          <div className="flex overflow-hidden rounded border border-gray-600">
+            <button
+              type="button"
+              onClick={() => setCommentOrder('asc')}
+              className={`px-3 py-1.5 text-sm font-medium transition-colors ${commentOrder === 'asc' ? 'bg-white text-black' : 'text-gray-300 hover:text-white'}`}
+            >
+              오래된순
+            </button>
+            <button
+              type="button"
+              onClick={() => setCommentOrder('desc')}
+              className={`px-3 py-1.5 text-sm font-medium transition-colors ${commentOrder === 'desc' ? 'bg-white text-black' : 'text-gray-300 hover:text-white'}`}
+            >
+              최신순
+            </button>
+          </div>
+        </div>
+
+        <form onSubmit={handleCommentSubmit} className="mb-6 flex flex-col gap-2">
+          <div className="flex gap-2">
+            <input
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              className="min-w-0 flex-1 rounded-lg border border-[#333] bg-[#111] px-4 py-3 text-sm text-white outline-none focus:border-pink-500"
+              placeholder="댓글을 입력하세요"
+            />
+            <button
+              type="submit"
+              disabled={isCommentInvalid || isCommentSubmitting}
+              className="rounded-lg bg-pink-500 px-5 py-3 text-sm font-bold text-white hover:bg-pink-600 disabled:cursor-not-allowed disabled:bg-[#3a3a3a] disabled:text-gray-500"
+            >
+              {isCommentSubmitting ? '작성 중...' : '작성'}
+            </button>
+          </div>
+          <p className={`text-xs ${isCommentInvalid ? 'text-gray-500' : 'text-gray-400'}`}>
+            댓글은 백엔드에 등록되고, 성공하면 목록을 다시 불러옵니다.
+          </p>
+        </form>
+
+        {isCommentsError && (
+          <QueryError message="댓글을 불러오지 못했습니다." onRetry={() => refetchComments()} />
+        )}
+
+        {isCommentsLoading && <CommentSkeletonList count={5} />}
+
+        {!isCommentsLoading && !isCommentsError && (
+          <div className="flex flex-col gap-4">
+            {comments.map((comment: any) => (
+              <article key={comment.id} className="rounded-lg border border-[#333] bg-[#1b1b1b] p-4">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="h-9 w-9 shrink-0 rounded-full bg-teal-200" />
+                    <span className="truncate text-sm font-bold text-white">
+                      {comment.author?.name || '알 수 없음'}
+                    </span>
+                  </div>
+                  <span className="shrink-0 text-xs text-gray-500">
+                    {comment.createdAt ? new Date(comment.createdAt).toLocaleDateString('ko-KR') : ''}
+                  </span>
+                </div>
+                <p className="text-sm leading-relaxed text-gray-300">{comment.content}</p>
+              </article>
+            ))}
+
+            {comments.length === 0 && (
+              <p className="py-8 text-center text-sm text-gray-500">아직 댓글이 없습니다.</p>
+            )}
+          </div>
+        )}
+
+        <div ref={commentLoadMoreRef} className="h-6" />
+
+        {isFetchingNextCommentsPage && <CommentSkeletonList count={3} />}
+        {!hasNextCommentsPage && comments.length > 0 && (
+          <p className="py-6 text-center text-sm text-gray-500">마지막 댓글입니다.</p>
+        )}
+      </section>
     </div>
   );
 }

@@ -6,6 +6,16 @@ export interface GetLPListParams {
   limit?: number;
 }
 
+export interface GetLPCommentsParams {
+  cursor?: number;
+  limit?: number;
+  order?: 'asc' | 'desc';
+}
+
+export interface CreateLPCommentRequest {
+  content: string;
+}
+
 export interface CreateLPRequest {
   title: string;
   content: string;
@@ -54,5 +64,15 @@ export const likeLP = async (lpid: string) => {
 
 export const unlikeLP = async (lpid: string) => {
   const response = await axiosInstance.delete(`/v1/lps/${lpid}/likes`);
+  return response.data;
+};
+
+export const getLPComments = async (lpid: string, params: GetLPCommentsParams) => {
+  const response = await axiosInstance.get(`/v1/lps/${lpid}/comments`, { params });
+  return response.data;
+};
+
+export const createLPComment = async (lpid: string, payload: CreateLPCommentRequest) => {
+  const response = await axiosInstance.post(`/v1/lps/${lpid}/comments`, payload);
   return response.data;
 };
