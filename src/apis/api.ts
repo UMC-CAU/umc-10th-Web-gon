@@ -1,4 +1,5 @@
 import axios from 'axios';
+import type { ApiResponse, LP, User } from '../types';
 
 export const axiosInstance = axios.create({
   baseURL: 'http://localhost:8000', 
@@ -16,6 +17,26 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+export const getMyInfo = async () => {
+  const response = await axiosInstance.get<ApiResponse<User>>('/v1/users/me');
+  return response.data;
+};
+
+export const getLPDetail = async (lpId: number) => {
+  const response = await axiosInstance.get<ApiResponse<LP>>(`/v1/lps/${lpId}`);
+  return response.data;
+};
+
+export const postLike = async (lpId: number) => {
+  const response = await axiosInstance.post(`/v1/lps/${lpId}/likes`);
+  return response.data;
+};
+
+export const deleteLike = async (lpId: number) => {
+  const response = await axiosInstance.delete(`/v1/lps/${lpId}/likes`);
+  return response.data;
+};
 
 axiosInstance.interceptors.response.use(
   (response) => {
