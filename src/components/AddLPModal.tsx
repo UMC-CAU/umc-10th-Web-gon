@@ -106,7 +106,7 @@ export default function AddLPModal({ isOpen, onClose }: AddLPModalProps) {
       >
         <div className="mb-5 flex items-center justify-between gap-4">
           <h2 id="add-lp-title" className="text-xl font-bold">
-            Add LP
+            LP 추가
           </h2>
           <button
             type="button"
@@ -203,7 +203,7 @@ export default function AddLPModal({ isOpen, onClose }: AddLPModalProps) {
             disabled={isSubmitting}
             className="mt-2 rounded-lg bg-pink-500 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-pink-600 disabled:cursor-not-allowed disabled:bg-[#444]"
           >
-            {isSubmitting ? 'Adding...' : 'Add LP'}
+            {isSubmitting ? '추가 중...' : 'LP 추가'}
           </button>
         </form>
       </section>

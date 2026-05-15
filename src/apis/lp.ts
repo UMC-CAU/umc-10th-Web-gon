@@ -38,6 +38,28 @@ export const getLPList = async (params: GetLPListParams) => {
   return response.data;
 };
 
+export const getMyLPList = async (params: GetLPListParams) => {
+  const { sort, ...restParams } = params;
+  const response = await axiosInstance.get<ApiResponse<CursorPage<LP>>>('/v1/lps/user', {
+    params: {
+      ...restParams,
+      order: sort === 'ascending' ? 'asc' : 'desc',
+    },
+  });
+  return response.data;
+};
+
+export const getMyLikedLPList = async (params: GetLPListParams) => {
+  const { sort, ...restParams } = params;
+  const response = await axiosInstance.get<ApiResponse<CursorPage<LP>>>('/v1/lps/likes/me', {
+    params: {
+      ...restParams,
+      order: sort === 'ascending' ? 'asc' : 'desc',
+    },
+  });
+  return response.data;
+};
+
 export const getLPDetail = async (lpid: string) => {
   const response = await axiosInstance.get<ApiResponse<LP>>(`/v1/lps/${lpid}`);
   return response.data;

@@ -103,7 +103,7 @@ export default function LPDetailPage() {
     if (!lp || !lpId || isLikePending) return;
 
     if (!myUserId) {
-      alert('Login is required.');
+      alert('로그인이 필요합니다.');
       navigate('/login');
       return;
     }
@@ -146,7 +146,7 @@ export default function LPDetailPage() {
   if (isError || !lp) {
     return (
       <QueryError
-        message="Failed to load LP detail."
+        message="LP 상세 정보를 불러오지 못했습니다."
         onRetry={() => refetch()}
       />
     );
@@ -158,7 +158,7 @@ export default function LPDetailPage() {
         <div className="mb-8 flex items-center justify-between gap-4">
           <div className="min-w-0">
             <p className="text-sm font-medium text-pink-400">
-              {lp.author?.name ?? 'Unknown artist'}
+              {lp.author?.name ?? '알 수 없는 작성자'}
             </p>
             <h1 className="mt-2 truncate text-2xl font-bold md:text-3xl">
               {lp.title}
@@ -169,7 +169,7 @@ export default function LPDetailPage() {
             type="button"
             onClick={handleToggleLike}
             disabled={isLikePending}
-            aria-label={isLiked ? 'Unlike LP' : 'Like LP'}
+            aria-label={isLiked ? '좋아요 취소' : '좋아요'}
             className="flex shrink-0 cursor-pointer items-center gap-2 rounded-full border border-[#444] px-4 py-2 text-sm font-bold transition-colors hover:border-pink-500 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Heart

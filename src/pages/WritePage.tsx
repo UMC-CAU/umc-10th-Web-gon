@@ -47,10 +47,10 @@ export default function WritePage() {
   return (
     <div className="flex justify-center items-start min-h-screen py-8">
       <div className="w-full max-w-2xl bg-[#181818] rounded-2xl p-8 border border-[#222]">
-        <h1 className="text-2xl font-bold text-pink-500 mb-8 text-center uppercase tracking-tighter">New Release</h1>
+        <h1 className="text-2xl font-bold text-pink-500 mb-8 text-center uppercase tracking-tighter">새 LP 등록</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-bold text-gray-400">TITLE</label>
+            <label className="text-sm font-bold text-gray-400">제목</label>
             <input
               type="text"
               required
@@ -62,7 +62,7 @@ export default function WritePage() {
           </div>
           
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-bold text-gray-400">IMAGE URL</label>
+            <label className="text-sm font-bold text-gray-400">이미지 URL</label>
             <input
               type="text"
               value={formData.thumbnail}
@@ -73,7 +73,7 @@ export default function WritePage() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-bold text-gray-400">TAGS</label>
+            <label className="text-sm font-bold text-gray-400">태그</label>
             <input
               type="text"
               required
@@ -85,7 +85,7 @@ export default function WritePage() {
           </div>
           
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-bold text-gray-400">DESCRIPTION</label>
+            <label className="text-sm font-bold text-gray-400">소개</label>
             <textarea
               required
               rows={5}
@@ -102,13 +102,13 @@ export default function WritePage() {
               onClick={() => navigate(-1)}
               className="flex-1 bg-[#282828] hover:bg-[#333] text-white font-bold py-4 rounded-xl transition-all"
             >
-              CANCEL
+              취소
             </button>
             <button
               type="submit"
               className="flex-1 bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-pink-500/20 transition-all"
             >
-              PUBLISH
+              등록
             </button>
           </div>
         </form>
