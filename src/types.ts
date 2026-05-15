@@ -45,7 +45,3 @@ export interface CursorPage<T> {
   nextCursor: number | null;
   hasNext: boolean;
 }
-
-export interface ImageUploadResult {
-  imageUrl: string;
-}

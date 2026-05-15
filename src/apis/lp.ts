@@ -1,5 +1,5 @@
 import { axiosInstance } from './api';
-import type { ApiResponse, CursorPage, ImageUploadResult, LP } from '../types';
+import type { ApiResponse, CursorPage, LP } from '../types';
 
 export interface GetLPListParams {
   sort?: 'ascending' | 'descending';
@@ -76,21 +76,4 @@ export const getLPComments = async (lpid: string, params: GetLPCommentsParams) =
 export const createLPComment = async (lpid: string, payload: CreateLPCommentRequest) => {
   const response = await axiosInstance.post(`/v1/lps/${lpid}/comments`, payload);
   return response.data;
-};
-
-export const uploadLPImage = async (file: File) => {
-  const formData = new FormData();
-  formData.append('file', file);
-
-  const response = await axiosInstance.post<ApiResponse<ImageUploadResult>>(
-    '/v1/uploads/public',
-    formData,
-    {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    },
-  );
-
-  return response.data.data.imageUrl;
 };
