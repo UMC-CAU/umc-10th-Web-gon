@@ -8,6 +8,7 @@ interface AuthContextType {
   refreshToken: string | null;
   login: (signInData: SignInRequest) => Promise<void>;
   logout: () => Promise<void>;
+  clearAuth: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -44,13 +45,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setRefreshToken(newRefreshToken);
   };
 
+  const clearAuth = () => {
+    removeAccessTokenFromStorage();
+    removeRefreshTokenFromStorage();
+    setAccessToken(null);
+    setRefreshToken(null);
+  };
+
   const logout = async () => {
     try {
       await postLogout();
-      removeAccessTokenFromStorage();
-      removeRefreshTokenFromStorage();
-      setAccessToken(null);
-      setRefreshToken(null);
+      clearAuth();
       
       alert('로그아웃 성공');
     } catch (error) {
@@ -60,7 +65,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ accessToken, refreshToken, login, logout }}>
+    <AuthContext.Provider value={{ accessToken, refreshToken, login, logout, clearAuth }}>
       {children}
     </AuthContext.Provider>
   );

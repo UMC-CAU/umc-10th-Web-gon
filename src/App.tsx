@@ -6,6 +6,7 @@ import LPDetailPage from './pages/LPDetailPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import WritePage from './pages/WritePage';
+import MyPage from './pages/MyPage';
 import { AuthProvider } from './contexts/AuthContext';
 
 function App() {
@@ -22,7 +23,7 @@ function App() {
             
             <Route element={<ProtectedLayout />}>
               <Route path="/lp/:lpid" element={<LPDetailPage />} />
-              <Route path="/mypage" element={<div className="text-white p-8 text-center text-xl">마이페이지 준비 중</div>} />
+              <Route path="/mypage" element={<MyPage />} />
               <Route path="/write" element={<WritePage />} />
             </Route>
           </Route>
